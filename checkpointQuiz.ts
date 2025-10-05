@@ -44,16 +44,17 @@ export interface QuizAttempt {
 }
 
 export class CheckpointQuiz {
-  async createQuiz(content: string): Promise<Quiz> {
+  // async createQuiz(content: string): Promise<Quiz> {
+  async createQuiz(content: string, llm: GeminiLLM) {
     try {
       if (!content || content.trim().length === 0) {
         throw new Error("Content must not be empty");
       }
 
-      const llm = new GeminiLLM();
       const prompt = `Generate a multiple-choice quiz question based on the following content:\n\n${content}\n\nProvide one question and four possible answers, indicating which one is correct. Format the response as follows:\nQuestion: <question>\nAnswers: <answer1>, <answer2>, <answer3>, <answer4>\nCorrect Answer: <correctAnswer>`;
 
       const response = await llm.executeLLM(prompt);
+      console.log("LLM Response:", response);
       const lines = response.split("\n").map((line) => line.trim());
 
       const questionLine = lines.find((line) => line.startsWith("Question:"));
@@ -93,5 +94,24 @@ export class CheckpointQuiz {
       console.error("Error creating quiz:", error);
       throw new Error("Failed to create quiz: " + error);
     }
+  }
+
+  /**
+   * Helper functions
+   */
+
+  /**
+   * Display the quiz in a readable format
+   */
+  displayQuiz(quiz: Quiz): void {
+    console.log("\nQuiz:");
+    console.log(`Q: ${quiz}`);
+    //   console.log("\nQuiz:");
+    //   console.log(`Q: ${quiz.question}`);
+    //   console.log("Options:");
+    //   quiz.answers.forEach((answer, index) => {
+    //     console.log(`  ${String.fromCharCode(65 + index)}. ${answer}`);
+    //   });
+    //   console.log(`(Correct Answer: ${quiz.correctAnswer})`);
   }
 }
